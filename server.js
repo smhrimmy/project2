@@ -76,6 +76,17 @@ fs.readdirSync(dirPath, { withFileTypes: true })
         res.status(500).json({ error: err.message });
       }
     });
+
+    // Also register POST for batch-check
+    if (routeName === 'batch-check') {
+      app.post(route, async (req, res) => {
+        try {
+          await handler(req, res);
+        } catch (err) {
+          res.status(500).json({ error: err.message });
+        }
+      });
+    }
   });
 
 const renderPlaceholderPage = async (res, msgId, logs) => {

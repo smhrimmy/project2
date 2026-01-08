@@ -20,7 +20,7 @@ const unwrapEnvVar = (varName, fallbackValue) => {
 }
 
 // Determine the deploy target (vercel, netlify, cloudflare, node)
-const deployTarget = unwrapEnvVar('PLATFORM', 'node').toLowerCase();
+const deployTarget = unwrapEnvVar('PLATFORM', process.env.VERCEL ? 'vercel' : 'node').toLowerCase();
 
 // Determine the output mode (server, hybrid or static)
 const output = unwrapEnvVar('OUTPUT', 'hybrid');
@@ -75,5 +75,15 @@ if (!isBossServer && isBossServer !== true) {
 }
 
 // Export Astro configuration
-export default defineConfig({ output, base, integrations, site, adapter, redirects });
+export default defineConfig({ 
+  output, 
+  base, 
+  integrations, 
+  site, 
+  adapter, 
+  redirects,
+  vite: {
+    envPrefix: ['VITE_', 'REACT_APP_', 'PUBLIC_']
+  }
+});
 
