@@ -3,6 +3,24 @@
     {
       "source": "/check/:path*",
       "destination": "/check"
+    },
+    {
+      "source": "/api/screenshot",
+      "destination": "/api/screenshot"
+    },
+    {
+      "source": "/api/:match*",
+      "destination": "/api/index?fn=:match*"
     }
-  ]
+  ],
+  "functions": {
+    "api/screenshot.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/index.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  }
 }
