@@ -1,0 +1,39 @@
+---
+import BaseLayout from '@layouts/Base.astro';
+import Main from '../web-check-live/main.tsx';
+import '../web-check-live/styles/index.css';
+
+// Static output for this page
+export const prerender = true;
+
+// For static build, we pass a generic pathname. 
+// The client-side router will handle the actual URL.
+const pathname = '/check'; 
+---
+
+<BaseLayout>
+  <Main pathname={pathname} client:only="react" />
+</BaseLayout>
+
+<script>
+  // Handle query params redirect on the client side
+  const searchParams = new URL(window.location.href).searchParams;
+  if (searchParams.has('url')) {
+    const url = searchParams.get('url');
+    if (url) {
+      window.location.href = `/check/${encodeURIComponent(url)}`;
+    }
+  }
+
+  // Handle manual form submission
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(event) {
+      event.preventDefault();
+      const input = this.querySelector('input[name="url"]');  
+      if (input && input.value) {
+        window.location.href = `/check/${encodeURIComponent(input.value)}`;
+      }
+    });
+  }
+</script>
