@@ -1,5 +1,4 @@
-import { type ReactNode, type MouseEventHandler } from 'react';
-
+import { type ReactNode, type ButtonHTMLAttributes } from 'react';
 import styled from '@emotion/styled';
 import { keyframes } from '@emotion/react';
 import colors from 'web-check-live/styles/colors';
@@ -7,20 +6,26 @@ import { type InputSize, applySize } from 'web-check-live/styles/dimensions';
 
 type LoadState = 'loading' | 'success' | 'error';
 
-interface ButtonProps {
+// Extend standard button props
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'title'> {
   children: ReactNode;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-  size?: InputSize,
-  bgColor?: string,
-  fgColor?: string,
-  styles?: string | object,
-  title?: string,
-  type?: 'button' | 'submit' | 'reset' | undefined,
-  loadState?: LoadState,
-  disabled?: boolean,
-};
+  size?: InputSize;
+  bgColor?: string;
+  fgColor?: string;
+  styles?: string | object; // Allow string (CSS) or object (style prop)
+  title?: string; // Override standard title to be optional string
+  loadState?: LoadState;
+}
 
-const StyledButton = styled.button<ButtonProps>`
+// Props specifically for the styled component
+interface StyledButtonProps {
+  size?: InputSize;
+  bgColor?: string;
+  fgColor?: string;
+  customStyles?: string; // Renamed from styles to avoid conflict
+}
+
+const StyledButton = styled.button<StyledButtonProps>`
   cursor: pointer;
   border: none;
   border-radius: 0.25rem;
@@ -31,27 +36,37 @@ const StyledButton = styled.button<ButtonProps>`
   justify-content: center;
   gap: 1rem;
   box-shadow: 3px 3px 0px ${colors.fgShadowColor};
+  
   &:hover {
     box-shadow: 5px 5px 0px ${colors.fgShadowColor};
   }
   &:active {
     box-shadow: -3px -3px 0px ${colors.fgShadowColor};
   }
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    box-shadow: none;
+  }
+
   ${props => applySize(props.size)};
+  
   ${(props) => props.bgColor ?
     `background: ${props.bgColor};` : `background: ${colors.primary};`
   }
+  
   ${(props) => props.fgColor ?
     `color: ${props.fgColor};` : `color: ${colors.background};`
   }
-  ${props => props.styles}
+  
+  ${props => props.customStyles || ''}
 `;
-
 
 const spinAnimation = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 `;
+
 const SimpleLoader = styled.div`
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
@@ -61,25 +76,37 @@ const SimpleLoader = styled.div`
   animation: ${spinAnimation} 1s linear infinite;
 `;
 
-const Loader = (props: { loadState: LoadState }) => {
-  if (props.loadState === 'loading') return <SimpleLoader />
-  if (props.loadState === 'success') return <span>✔</span>
-  if (props.loadState === 'error') return <span>✗</span>
+const Loader = ({ loadState }: { loadState: LoadState }) => {
+  if (loadState === 'loading') return <SimpleLoader />;
+  if (loadState === 'success') return <span>✔</span>;
+  if (loadState === 'error') return <span>✗</span>;
   return <span></span>;
 };
 
 const Button = (props: ButtonProps): JSX.Element => {
-  const { children, size, bgColor, fgColor, onClick, styles, title, loadState, type } = props;
+  const { 
+    children, 
+    size, 
+    bgColor, 
+    fgColor, 
+    styles, 
+    loadState, 
+    ...rest 
+  } = props;
+
+  // Handle styles prop: if it's a string, pass as customStyles, if object pass as style
+  const customStyles = typeof styles === 'string' ? styles : undefined;
+  const inlineStyle = typeof styles === 'object' ? styles : undefined;
+
   return (
     <StyledButton
-      onClick={onClick || (() => null) }
       size={size}
       bgColor={bgColor}
       fgColor={fgColor}
-      styles={styles}
-      title={title?.toString()}
-      type={type || 'button'}
-      >
+      customStyles={customStyles}
+      style={inlineStyle}
+      {...rest}
+    >
       { loadState && <Loader loadState={loadState} /> }
       {children}
     </StyledButton>

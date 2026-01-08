@@ -3,7 +3,14 @@ import { useFrame } from '@react-three/fiber';
 import { Stars, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-const ServerRack = ({ position, rotationSpeed = 0.001, floatSpeed = 1, floatOffset = 0 }) => {
+interface ServerRackProps {
+  position: [number, number, number];
+  rotationSpeed?: number;
+  floatSpeed?: number;
+  floatOffset?: number;
+}
+
+const ServerRack = ({ position, rotationSpeed = 0.001, floatSpeed = 1, floatOffset = 0 }: ServerRackProps) => {
   const mesh = useRef<THREE.Group>(null);
 
   useFrame((state) => {

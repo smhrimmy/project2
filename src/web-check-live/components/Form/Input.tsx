@@ -1,35 +1,39 @@
-import { type InputHTMLAttributes } from 'react';
+import { type InputHTMLAttributes, type ChangeEvent, type KeyboardEvent } from 'react';
 import styled from '@emotion/styled';
 import colors from 'web-check-live/styles/colors';
 import { type InputSize, applySize } from 'web-check-live/styles/dimensions';
 
 type Orientation = 'horizontal' | 'vertical';
 
-interface Props {
-  id: string,
-  value: string,
-  name?: string,
-  label?: string,
-  placeholder?: string,
-  disabled?: boolean,
-  size?: InputSize,
+// Extend standard input props
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'onChange'> {
+  label?: string;
+  size?: InputSize;
   orientation?: Orientation;
-  handleChange: (nweVal: React.ChangeEvent<HTMLInputElement>) => void,
-  handleKeyDown?: (keyEvent: React.KeyboardEvent<HTMLInputElement>) => void,
-};
+  // Support both handleChange and standard onChange
+  handleChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
+}
 
-type SupportedElements = HTMLInputElement | HTMLLabelElement | HTMLDivElement;
-interface StyledInputTypes extends InputHTMLAttributes<SupportedElements> {
+interface StyledInputProps {
   inputSize?: InputSize;
-  orientation?: Orientation;
-};
+}
 
-const InputContainer = styled.div<StyledInputTypes>`
+interface StyledContainerProps {
+  orientation?: Orientation;
+}
+
+interface StyledLabelProps {
+  inputSize?: InputSize;
+}
+
+const InputContainer = styled.div<StyledContainerProps>`
   display: flex;
   ${props => props.orientation === 'vertical' ? 'flex-direction: column;' : ''};
 `;
 
-const StyledInput = styled.input<StyledInputTypes>`
+const StyledInput = styled.input<StyledInputProps>`
   background: ${colors.background};
   color: ${colors.textColor};
   border: none;
@@ -43,31 +47,42 @@ const StyledInput = styled.input<StyledInputTypes>`
   ${props => applySize(props.inputSize)};
 `;
 
-const StyledLabel = styled.label<StyledInputTypes>`
+const StyledLabel = styled.label<StyledLabelProps>`
   color: ${colors.textColor};
   ${props => applySize(props.inputSize)};
   padding: 0;
   font-size: 1.6rem;
 `;
 
-const Input = (inputProps: Props): JSX.Element => {
+const Input = (props: InputProps): JSX.Element => {
+  const { 
+    id, 
+    label, 
+    size, 
+    orientation, 
+    handleChange, 
+    onChange, 
+    handleKeyDown, 
+    ...rest 
+  } = props;
 
-  const { id, value, label, placeholder, name, disabled, size, orientation, handleChange, onChange, handleKeyDown } = inputProps;
+  // Handler for change events
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (onChange) onChange(e);
+    if (handleChange) handleChange(e);
+  };
 
   return (
-  <InputContainer orientation={orientation}>
-    { label && <StyledLabel htmlFor={id} inputSize={size}>{ label }</StyledLabel> }
-    <StyledInput
-      id={id}
-      value={value}
-      placeholder={placeholder}
-      name={name}
-      disabled={disabled}
-      onChange={handleChange || onChange}
-      inputSize={size}
-      onKeyDown={handleKeyDown || (() => {})}
-    />
-  </InputContainer>
+    <InputContainer orientation={orientation}>
+      { label && <StyledLabel htmlFor={id} inputSize={size}>{ label }</StyledLabel> }
+      <StyledInput
+        id={id}
+        inputSize={size}
+        onChange={onInputChange}
+        onKeyDown={handleKeyDown}
+        {...rest}
+      />
+    </InputContainer>
   );
 };
 
