@@ -6,84 +6,62 @@ import react from "@astrojs/react";
 import partytown from '@astrojs/partytown';
 import sitemap from '@astrojs/sitemap';
 
-// Adapters
-import vercelAdapter from '@astrojs/vercel/serverless';
-import netlifyAdapter from '@astrojs/netlify';
-import nodeAdapter from '@astrojs/node';
-import cloudflareAdapter from '@astrojs/cloudflare';
+// Adapter
+// Using the Vercel adapter in static mode to ensure no serverless runtime errors.
+import vercel from '@astrojs/vercel/static';
 
-// Helper function to unwrap both Vite and Node environment variables
-const unwrapEnvVar = (varName, fallbackValue) => {
-  const classicEnvVar = process?.env && process.env[varName];
-  const viteEnvVar = import.meta.env[varName];
-  return classicEnvVar || viteEnvVar || fallbackValue;
-}
-
-// Determine the deploy target (vercel, netlify, cloudflare, node)
-const deployTarget = unwrapEnvVar('PLATFORM', process.env.VERCEL ? 'vercel' : 'node').toLowerCase();
-
-// Determine the output mode (server, hybrid or static)
-const output = unwrapEnvVar('OUTPUT', 'hybrid');
-
-// The FQDN of where the site is hosted (used for sitemaps & canonical URLs)
-const site = unwrapEnvVar('SITE_URL', 'https://site-sleuth.xyz');
-
-// The base URL of the site (if serving from a subdirectory)
-const base = unwrapEnvVar('BASE_URL', '/');
-
-// Should run the app in boss-mode (requires extra configuration)
-const isBossServer = unwrapEnvVar('BOSS_SERVER', false);
-
-// Initialize Astro integrations
-const integrations = [svelte(), react(), partytown(), sitemap()];
-
-// Set the appropriate adapter, based on the deploy target
-function getAdapter(target) {
-  switch(target) {
-    case 'vercel':
-      return vercelAdapter();
-    case 'netlify':
-      return netlifyAdapter();
-    case 'cloudflare':
-      return cloudflareAdapter();
-    case 'node':
-      return nodeAdapter({ mode: 'middleware' });
-    default:
-      throw new Error(`Unsupported deploy target: ${target}`);
-  }
-}
-const adapter = getAdapter(deployTarget);
-
-// Print build information to console
-console.log(
-  `\n\x1b[1m\x1b[35m Preparing to start build of Site Sleuth.... \x1b[0m\n`,
-  `\x1b[35m\x1b[2mCompiling for "${deployTarget}" using "${output}" mode, `
-  + `to deploy to "${site}" at "${base}"\x1b[0m\n`,
-  `\x1b[2m\x1b[36m🛟 For documentation and support, visit the GitHub repo: ` +
-  `https://github.com/dlpra/site-sleuth \n`,
-  `💖 Found Site-Sleuth useful? Consider sponsoring us on GitHub ` +
-  `to help fund maintenance & development.\x1b[0m\n`,
-);
-
-const redirects = {
-  '/about': '/check/about',
+// Helper to get environment variables safely
+const getEnv = (key, fallback) => {
+  return process.env[key] || import.meta.env?.[key] || fallback;
 };
 
-// Skip the marketing homepage for self-hosted users
-if (!isBossServer && isBossServer !== true) {
-  redirects['/'] = '/check';
-}
+// Site Configuration
+const site = getEnv('SITE_URL', 'https://site-sleuth.xyz');
+const base = getEnv('BASE_URL', '/');
 
 // Export Astro configuration
-export default defineConfig({ 
-  output, 
-  base, 
-  integrations, 
-  site, 
-  adapter, 
-  redirects,
+export default defineConfig({
+  // STRICT REQUIREMENT: Static output to avoid serverless runtime errors (_render nodejs18.x)
+  output: 'static',
+  
+  // Base URL and Site URL for SEO/Sitemap
+  base,
+  site,
+
+  // Integrations
+  integrations: [
+    svelte(), 
+    react(), 
+    partytown({
+      config: {
+        forward: ['dataLayer.push'],
+      },
+    }), 
+    sitemap()
+  ],
+
+  // Adapter configuration
+  // We use the static adapter to generate plain HTML/CSS/JS.
+  // This removes any dependency on Node.js runtime versions at deployment time.
+  adapter: vercel({
+    webAnalytics: { enabled: true },
+  }),
+
+  // Vite configuration
   vite: {
-    envPrefix: ['VITE_', 'REACT_APP_', 'PUBLIC_']
+    envPrefix: ['VITE_', 'REACT_APP_', 'PUBLIC_'],
+    build: {
+      // Ensure we don't accidentally bundle server-side only packages
+      rollupOptions: {
+        external: ['puppeteer', 'chrome-aws-lambda', 'better-sqlite3']
+      }
+    }
+  },
+
+  // Strict image service to avoid serverless image optimization functions if not needed
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp'
+    }
   }
 });
-
