@@ -1,5 +1,8 @@
 {
-  "framework": "astro",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "rewrites": [
+    {
+      "source": "/check/:path*",
+      "destination": "/check"
+    }
+  ]
 }
