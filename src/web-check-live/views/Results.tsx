@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, type ReactNode } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { ToastContainer } from 'react-toastify';
 import Masonry from 'react-masonry-css'
@@ -13,7 +13,7 @@ import type { RowProps }  from 'web-check-live/components/Form/Row';
 
 import Loader from 'web-check-live/components/misc/Loader';
 import ErrorBoundary from 'web-check-live/components/misc/ErrorBoundary';
-import SelfScanMsg from 'web-check-live/components/misc/SelfScanMsg';
+// import SelfScanMsg from 'web-check-live/components/misc/SelfScanMsg';
 import DocContent from 'web-check-live/components/misc/DocContent';
 import ProgressBar, { type LoadingJob, type LoadingState, initialJobs } from 'web-check-live/components/misc/ProgressBar';
 import ActionButtons from 'web-check-live/components/misc/ActionButtons';
