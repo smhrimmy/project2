@@ -13,10 +13,11 @@ interface ButtonProps {
   size?: InputSize,
   bgColor?: string,
   fgColor?: string,
-  styles?: string,
+  styles?: string | object,
   title?: string,
   type?: 'button' | 'submit' | 'reset' | undefined,
   loadState?: LoadState,
+  disabled?: boolean,
 };
 
 const StyledButton = styled.button<ButtonProps>`

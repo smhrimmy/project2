@@ -52,7 +52,7 @@ const StyledLabel = styled.label<StyledInputTypes>`
 
 const Input = (inputProps: Props): JSX.Element => {
 
-  const { id, value, label, placeholder, name, disabled, size, orientation, handleChange, handleKeyDown } = inputProps;
+  const { id, value, label, placeholder, name, disabled, size, orientation, handleChange, onChange, handleKeyDown } = inputProps;
 
   return (
   <InputContainer orientation={orientation}>
@@ -63,7 +63,7 @@ const Input = (inputProps: Props): JSX.Element => {
       placeholder={placeholder}
       name={name}
       disabled={disabled}
-      onChange={handleChange}
+      onChange={handleChange || onChange}
       inputSize={size}
       onKeyDown={handleKeyDown || (() => {})}
     />

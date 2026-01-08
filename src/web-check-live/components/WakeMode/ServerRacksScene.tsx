@@ -18,7 +18,7 @@ const ServerRack = ({ position, rotationSpeed = 0.001, floatSpeed = 1, floatOffs
       {/* Rack Body */}
       <mesh>
         <boxGeometry args={[2, 4, 1]} />
-        <meshStandardMaterial color="#1a1a2e" metallic={0.8} roughness={0.2} />
+        <meshStandardMaterial color="#1a1a2e" metalness={0.8} roughness={0.2} />
       </mesh>
       
       {/* LED Indicators */}
