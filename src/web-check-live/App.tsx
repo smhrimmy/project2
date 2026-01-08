@@ -11,6 +11,9 @@ import NotFound from 'web-check-live/views/NotFound.tsx';
 import ErrorBoundary from 'web-check-live/components/boundaries/PageError.tsx';
 import GlobalStyles from './styles/globals.tsx';
 
+import { WakeModeProvider, useWakeMode } from 'web-check-live/contexts/WakeModeContext';
+import WakeModeOverlay from 'web-check-live/components/WakeMode/WakeModeOverlay';
+
 const Layout = () => {
   return (
   <>
@@ -20,18 +23,30 @@ const Layout = () => {
   );
 }
 
+const AppContent = () => {
+  const { isWakeModeActive, exitWakeMode } = useWakeMode();
+  return (
+    <>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/check" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="home" element={<Home />} />
+            <Route path="about" element={<About />} />
+            <Route path=":urlToScan" element={<Results />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </ErrorBoundary>
+      {isWakeModeActive && <WakeModeOverlay onClick={exitWakeMode} />}
+    </>
+  );
+}
+
 export default function App() {
   return (
-    <ErrorBoundary>
-      <Routes>
-        <Route path="/check" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="home" element={<Home />} />
-          <Route path="about" element={<About />} />
-          <Route path=":urlToScan" element={<Results />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
-    </ErrorBoundary>
+    <WakeModeProvider>
+      <AppContent />
+    </WakeModeProvider>
   );
 }

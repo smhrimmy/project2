@@ -16,6 +16,7 @@
     <a href="/check" class="nav-link">Check</a>
     <a href="/site-sleuth-api" class="nav-link">API</a>
     <a href="/account" class="nav-link">Login</a>
+    <a href="#" id="wake-mode-toggle" class="nav-link">🌙 Wake Mode</a>
   </div>
 </nav>
 
@@ -106,3 +107,17 @@
     }
   }
 </style>
+
+<script>
+  // Wake mode toggle functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const wakeBtn = document.getElementById('wake-mode-toggle');
+    if (wakeBtn) {
+      wakeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Dispatch custom event that React app will listen for
+        window.dispatchEvent(new CustomEvent('toggleWakeMode'));
+      });
+    }
+  });
+</script>

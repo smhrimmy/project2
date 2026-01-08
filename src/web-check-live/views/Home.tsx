@@ -13,6 +13,8 @@ import docs from 'web-check-live/utils/docs';
 import colors from 'web-check-live/styles/colors';
 import { determineAddressType } from 'web-check-live/utils/address-type-checker';
 
+import FloatingToolbar from 'web-check-live/components/AgentTools/FloatingToolbar';
+
 const HomeContainer = styled.section`
   display: flex;
   flex-direction: column;

@@ -68,6 +68,8 @@ import {
   parseShodanResults, type ShodanResults
 } from 'web-check-live/utils/result-processor';
 
+import FloatingToolbar from 'web-check-live/components/AgentTools/FloatingToolbar';
+
 const ResultsOuter = styled.div`
   display: flex;
   flex-direction: column;
@@ -941,6 +943,7 @@ const Results = (props: { address?: string } ): JSX.Element => {
       <Footer />
       <Modal isOpen={modalOpen} closeModal={()=> setModalOpen(false)}>{modalContent}</Modal>
       <ToastContainer limit={3} draggablePercent={60} autoClose={2500} theme="dark" position="bottom-right" />
+      <FloatingToolbar />
     </ResultsOuter>
   );
 }
