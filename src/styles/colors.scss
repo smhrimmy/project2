@@ -1,0 +1,35 @@
+:root {
+  --primary: #ff6b6b;
+  --primary-lighter: #ff8e8e;
+  --text-color: #ffffff;
+  --text-color-secondary: #ffffffb6;
+  --text-color-thirdly: #ffffff5b;
+  --background: #0d0d0d;
+  --background-darker: #0a0a0a;
+  --background-lighter: #1a1a1a;
+  --background-50: #0d0d0d80;
+  --bg-shadow-color: #000000;
+  --fg-shadow-color: #ff6b6b;
+  --primary-transparent: #ff6b6b30;
+
+  // Action Colors
+  --info: #4ecdc4;
+  --success: #45b7d1;
+  --warning: #ffa07a;
+  --error: #ff6b6b;
+  --danger: #ff4757;
+  --neutral: #37474f;
+}
+
+html[data-theme="light"] {
+  --primary: #4a7700;
+  --primary-lighter: #a4cf50;
+  --text-color: #333333;
+  --text-color-secondary: #57667e;
+  --background: #ffffff;
+  --background-darker: #f0f0f0;
+  --background-lighter: #fafafa;
+  --bg-shadow-color: #e0e0e0;
+  --fg-shadow-color: #678800;
+  --primary-transparent: #4a770033;
+}
